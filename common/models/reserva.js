@@ -1,13 +1,55 @@
-/* eslint-disable max-len */
+  /* eslint-disable max-len */
 'use strict';
 
 module.exports = function(Reserva) {
+  // Fazendo hooks das requisições POST e PUT
   Reserva.observe('before save', function verifica(ctx, next) {
-    novosValores(ctx, next);
+    travaDeHorario(ctx, next);
   });
+  function travaDeHorario(ctx, next) {
+    let horarioMinimo = 10;
+    let horarioMaximo = 22;
+    let erro = new Error('Horário indisponível para reservas, tente agendar entre 10h e 22h');
+    erro.statusCode = 403;
+    erro.code = 'HORARIO_INVALIDO';
+    if (ctx.instance.inicioEm.getHours() < horarioMinimo && ctx.instance.inicioEm.getHours() > horarioMaximo && ctx.instance.fimEm.getHours() < horarioMinimo && ctx.instance.fimEm.getHours() > horarioMaximo) {
+      next(erro);
+    } else {
+      verificaDisponibilidade(ctx, next);
+    }
+  }
+  function verificaDisponibilidade(ctx, next) {
+    let intervaloDeHora = [ctx.instance.inicioEm, ctx.instance.fimEm];
+    let filtro = {where: {
+      or:
+      [{inicioEm: {between: intervaloDeHora}},
+          {fimEm: {between: intervaloDeHora}}],
+    }};
+    let erro =  new Error('O horário solicitado não está disponível, favor selecione um outro horário.');
+    erro.code = 'HORARIO_INDISPONIVEL';
+    erro.statusCode = 401;
+    Reserva.find(filtro, (err, res)=>{
+      if (ctx.isNewInstance &&  res.length > 0) {
+        next(erro);
+      } else {
+        if (!ctx.isNewInstance && res.length > 1) {
+          next(erro);
+        } else {
+          if (res.length == 1 && res[0].id == ctx.instance.id){
+            next(erro);
+          } else {
+            novosValores(ctx, next);
+          }
+        }
+      }
+    });
+  }
+
   function novosValores(ctx, next) {
     ctx.instance.criadoEm = new Date();
-    ctx.instance.ativa = 'ativa';
+    if (!ctx.instance.status) {
+      ctx.instance.status = 'ativa';
+    }
     let minutos = ctx.instance.fimEm - ctx.instance.inicioEm;
     ctx.instance.duracao = minutos / 60000;
     ctx.instance.valorEmReais = parseFloat(ctx.instance.duracao * 0.5);
@@ -29,25 +71,11 @@ module.exports = function(Reserva) {
       erro.statusCode = 422;
       next(erro);
     } else {
-      verificaDisponibilidade(ctx, next);
+      next();
     }
   }
-  function verificaDisponibilidade(ctx, next) {
-    let filtro = {where: {
-      or:
-      [{inicioEm: {between: [ctx.instance.inicioEm, ctx.instance.fimEm]}},
-          {fimEm: {between: [ctx.instance.inicioEm, ctx.instance.fimEm]}}],
-    }};
-    Reserva.find(filtro, (err, res)=>{
-      if (res.length > 0) {
-        let erro =  new Error('O horário solicitado não está disponível, favor selecione um outro horário.');
-        erro.code = 'HORARIO_INDISPONIVEL';
-        erro.statusCode = 401;
-        next(erro);
-      } else {
-        next();
-      }
-    });
-  }
-};
+  // fazendo hook das requisições delete
+  Reserva.observe('before safe', (ctx, next)=>{
 
+  });
+};
