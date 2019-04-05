@@ -12,10 +12,23 @@ module.exports = function(Reserva) {
     let erro = new Error('Horário indisponível para reservas, tente agendar entre 10h e 22h');
     erro.statusCode = 403;
     erro.code = 'HORARIO_INVALIDO';
-    if (ctx.instance.inicioEm.getHours() < horarioMinimo && ctx.instance.inicioEm.getHours() > horarioMaximo && ctx.instance.fimEm.getHours() < horarioMinimo && ctx.instance.fimEm.getHours() > horarioMaximo) {
+    if (ctx.instance.inicioEm.getHours() < horarioMinimo &&
+        ctx.instance.inicioEm.getHours() > horarioMaximo &&
+        ctx.instance.fimEm.getHours() < horarioMinimo &&
+        ctx.instance.fimEm.getHours() > horarioMaximo) {
       next(erro);
     } else {
+      verificaHorasRedondas(ctx, next);
+    }
+  }
+  function verificaHorasRedondas(ctx, next) {
+    let erro = new Error('Horários só podem ser redondos, exemplo: 5h, 6h, 7h, 8h. Ajeite e tente novamente');
+    erro.statusCode = 422;
+    erro.code = 'HORÁRIO_INVÁLIDO';
+    if (ctx.instance.inicioEm.getMinutes() == 0 && ctx.instance.fimEm.getMinutes() == 0) {
       verificaDisponibilidade(ctx, next);
+    } else {
+      next(erro);
     }
   }
   function verificaDisponibilidade(ctx, next) {
@@ -44,7 +57,6 @@ module.exports = function(Reserva) {
       }
     });
   }
-
   function novosValores(ctx, next) {
     ctx.instance.criadoEm = new Date();
     if (!ctx.instance.status) {
@@ -75,7 +87,7 @@ module.exports = function(Reserva) {
     }
   }
   // fazendo hook das requisições delete
-  Reserva.observe('before safe', (ctx, next)=>{
-
+  Reserva.observe('before delete', (ctx, next)=>{
+    
   });
 };
