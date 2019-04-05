@@ -1,0 +1,27 @@
+{
+  "name": "Reserva",
+  "plural": "Reservas",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "tipo": {
+      "type": "string",
+      "required": true
+    },
+    "inicioEm": {
+      "type": "date",
+      "required": true
+    },
+    "fimEm": {
+      "type": "date",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}
