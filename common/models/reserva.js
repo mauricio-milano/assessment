@@ -114,7 +114,7 @@ module.exports = function(Reserva) {
       if (resultado.length == 0) {
         callback(null, [data]);
       } else {
-        // sugestaoHorarios(data, quadras, callback);
+        sugestaoHorarios(data, quadras, callback);
       }
     });
   };
@@ -123,15 +123,15 @@ module.exports = function(Reserva) {
     let resultado = [];
     data.fimEm = new Date(data.fimEm);
     data.inicioEm = new Date(data.inicioEm);
-    let dataUmaHoraAMais = criaObjWhere(data.tipo, data.inicioEm.setHours(data.inicioEm.getHours + 1), data.fimEm.setHours(data.fimEm.getHours + 1));
-    let dataUmaHoraAMenos = criaObjWhere(data.tipo, data.inicioEm.setHours(data.inicioEm.getHours - 1), data.fimEm.setHours(data.fimEm.getHours - 1));
+    let dataUmaHoraAMais = criaObjWhere(data.tipo, data.inicioEm.setHours(data.inicioEm.getHours() + 1), data.fimEm.setHours(data.fimEm.getHours() + 1));
+    let dataUmaHoraAMenos = criaObjWhere(data.tipo, data.inicioEm.setHours(data.inicioEm.getHours() - 1), data.fimEm.setHours(data.fimEm.getHours() - 1));
     let outrasQuadras = [criaObjWhere(quadras[0], data.inicioEm, data.fimEm), criaObjWhere(quadras[1], data.inicioEm, data.fimEm)];
     let dataUmaHoraAMaisQuadraDiferente = [
-      criaObjWhere(quadras[0], data.inicioEm.setHours(data.inicioEm.getHours + 1), data.fimEm.setHours(data.fimEm.getHours + 1)),
-      criaObjWhere(quadras[1], data.inicioEm.setHours(data.inicioEm.getHours + 1), data.fimEm.setHours(data.fimEm.getHours + 1))];
+      criaObjWhere(quadras[0], data.inicioEm.setHours(data.inicioEm.getHours() + 1), data.fimEm.setHours(data.fimEm.getHours() + 1)),
+      criaObjWhere(quadras[1], data.inicioEm.setHours(data.inicioEm.getHours() + 1), data.fimEm.setHours(data.fimEm.getHours() + 1))];
     let dataUmaHoraAMenosQuadraDiferente = [
-      criaObjWhere(quadras[0], data.inicioEm.setHours(data.inicioEm.getHours - 1), data.fimEm.setHours(data.fimEm.getHours - 1)),
-      criaObjWhere(quadras[1], data.inicioEm.setHours(data.inicioEm.getHours - 1), data.fimEm.setHours(data.fimEm.getHours - 1))];
+      criaObjWhere(quadras[0], data.inicioEm.setHours(data.inicioEm.getHours() - 1), data.fimEm.setHours(data.fimEm.getHours() - 1)),
+      criaObjWhere(quadras[1], data.inicioEm.setHours(data.inicioEm.getHours() - 1), data.fimEm.setHours(data.fimEm.getHours() - 1))];
     let obj = {
       dataUmaHoraAMais: dataUmaHoraAMais,
       dataUmaHoraAMenos: dataUmaHoraAMenos,
@@ -143,22 +143,22 @@ module.exports = function(Reserva) {
       dataUmaHoraAMenosQuadraDiferente2: dataUmaHoraAMenosQuadraDiferente[1],
     };
     Object.keys(obj).forEach(key=>{
-      Reserva.find({where: obj[key]}, (erro, resp)=>{
+      Reserva.find({where: obj[key]}, async (erro, resp)=>{
         if (erro) {
           callback(erro);
         } else {
           if (resp.length == 0){
             // eslint-disable-next-line no-undef
-            resultado.push(obj[key]);
+          await resultado.push(obj[key]);
           }
         }
       });
-    }).then(()=>{
-      // eslint-disable-next-line no-undef
-      callback(null, resultado);
+      setTimeout(()=>{
+        // TODO fazer isso ser sincrono e nao por tempo
+        callback(null, resultado);
+      },5000);
     });
   }
-
   function criaObjWhere(tipo, inicioEm, fimEm){
     let resp = {
       inicioEm: inicioEm,
