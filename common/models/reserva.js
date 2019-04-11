@@ -180,6 +180,7 @@ module.exports = function(Reserva) {
         callback(erro);
       } else {
         res[0].status = 'cancelada';
+        res[0].canceladaEm = new Date();
         // eslint-disable-next-line no-undef
         res[0].save(salvo=>{
           callback(null, res[0]);
