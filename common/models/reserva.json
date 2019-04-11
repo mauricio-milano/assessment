@@ -23,5 +23,63 @@
   "validations": [],
   "relations": {},
   "acls": [],
-  "methods": {}
+  "methods": {
+    "verificaDisponibilidade": {
+      "accepts": [
+        {
+          "arg": "data",
+          "type": "object",
+          "required": true,
+          "description": "objeto que vai ser utilizado para consulta",
+          "http":{
+            "source":"body"
+          }
+        }
+      ],
+      "returns": [
+        {
+          "arg": "resultado",
+          "type": "array",
+          "root": false,
+          "description": "Saida"
+        }
+      ],
+      "description": "Verifica a disponibilidade ",
+      "http": [
+        {
+          "path": "/disponibilidade",
+          "verb": "post"
+        }
+      ]
+    },
+
+    "deletar": {
+      "accepts": [
+        {
+          "type": "string",
+          "required": true,
+          "arg": "id",
+          "description": "objeto que vai ser utilizado para consulta",
+          "http":{
+            "source":"path"
+          }
+        }
+      ],
+      "returns": [
+        {
+          "arg": "resultado",
+          "type": "string",
+          "root": false,
+          "description": "Saida"
+        }
+      ],
+      "description": "Apaga reservas",
+      "http": [
+        {
+          "path": "/apagar/:id",
+          "verb": "post"
+        }
+      ]
+    }
+  }
 }
