@@ -1,23 +1,23 @@
 ## Assessment de back end 
 
-#Introdução 
+# Introdução 
 Sistemas de reservas de quadras
 
 
-#instalação 
+# instalação 
 instale as dependencias 
 
-````
-npm install 
-
 ```
-#execuçao
+npm install 
+```
+
+# Execuçao
 
 ```
 nodemon . 
 ```
 
 
-#Considerações finais
+# Considerações finais
   
 Cassio, passa um negocio mais dificil! 
