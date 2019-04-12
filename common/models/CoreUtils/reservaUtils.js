@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-/* eslint-disable no-undef */
+// /* eslint-disable no-undef */
 'use strict';
 const ObjectManipulation = require('../CoreUtils/ObjectManipulation');
 const travaDeHorario = (ctx)=>{
@@ -90,8 +90,7 @@ const verificaDisponibilidade = (ctx, Reserva)=>{
     });
   });
 };
-const sugestaoHorarios = (data, quadras, callback) => {
-  // eslint-disable-next-line no-undef
+const sugestaoHorarios = (data, quadras, Reserva, callback) => {
   let resultado = [];
   data.fimEm = new Date(data.fimEm);
   data.inicioEm = new Date(data.inicioEm);
@@ -140,13 +139,12 @@ const sugestaoHorarios = (data, quadras, callback) => {
     dataUmaHoraAMenosQuadraDiferente2: dataUmaHoraAMenosQuadraDiferente[1],
   };
   Object.keys(obj).forEach(key=>{
-    let filtro = object.criaFiltroDeIntervalo(obj[key]);
+    let filtro = ObjectManipulation.criaFiltroDeIntervalo(obj[key]);
     Reserva.find(filtro, (erro, resp)=>{
       if (erro) {
         callback(erro);
       } else {
         if (resp.length == 0){
-          // eslint-disable-next-line no-undef
           resultado.push(obj[key]);
         }
       }

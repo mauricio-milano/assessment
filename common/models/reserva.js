@@ -56,7 +56,7 @@ module.exports = function(Reserva) {
       if (resultado.length == 0) {
         callback(null, [data]);
       } else {
-        reservaModel.sugestaoHorarios(data, quadras, callback);
+        reservaModel.sugestaoHorarios(data, quadras, Reserva, callback);
       }
     });
   };
@@ -75,7 +75,6 @@ module.exports = function(Reserva) {
       } else {
         res[0].status = 'cancelada';
         res[0].canceladaEm = new Date();
-        // eslint-disable-next-line no-undef
         res[0].save(salvo=>{
           callback(null, res[0]);
         });
