@@ -82,7 +82,7 @@ const verificaDisponibilidade = (ctx, Reserva, verbo)=>{
         if (verbo == 'put' && res.length > 1) {
           reject(erro);
         } else {
-          if (res.length == 1 && res[0].id == ctx.id) {
+          if (res.length == 1 && res[0].id != ctx.id) {
             reject(erro);
           } else {
             resolve(true);

@@ -16,8 +16,8 @@ const alteraHora = (hora, qtd) => {
   return hora.setHours(hora.getHours() + qtd);
 };
 const criaFiltroDeintervalo = (data) => {
-  let fim = data.fimEm;
-  let inicio = data.inicioEm;
+  let fim = new Date(data.fimEm);
+  let inicio = new Date(data.inicioEm);
   fim.setSeconds(59);
   fim.setMinutes(59);
   fim.setHours(fim.getHours() - 1);

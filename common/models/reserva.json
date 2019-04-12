@@ -96,6 +96,34 @@
         }
       ]
     },
+    "put": {
+      "accepts": [
+        {
+          "arg": "data",
+          "type": "object",
+          "required": true,
+          "description": "objeto que vai ser alterado",
+          "http":{
+            "source":"body"
+          }
+        }
+      ],
+      "returns": [
+        {
+          "arg": "resultado",
+          "type": "array",
+          "root": false,
+          "description": "Saida"
+        }
+      ],
+      "description": "Cria novas reservas no sistema ",
+      "http": [
+        {
+          "path": "/",
+          "verb": "put"
+        }
+      ]
+    },
     "verificaDisponibilidade": {
       "accepts": [
         {

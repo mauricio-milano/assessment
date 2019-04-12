@@ -29,6 +29,11 @@ module.exports = function(Reserva) {
       callback(null, resultado);
     });
   };
+  /**
+   * cadastra reservas no sistema
+   * @param {object} data objeto que vai ser cadastrado
+   * @param {Function(Error, array)} callback
+   */
   Reserva.post = (data, callback) =>{
     reservaModel.travaDeHorario(data).then(()=>{
       reservaModel.verificaHorasRedondas(data).then(()=>{
@@ -59,11 +64,49 @@ module.exports = function(Reserva) {
     });
   };
   /**
+   * atualiza reserva no sistema
+   * @param {object} data objeto que vai ser alterado
+   * @param {Function(Error, array)} callback
+   */
+  Reserva.put = (data, callback) => {
+    reservaModel.travaDeHorario(data).then(()=>{
+      reservaModel.verificaHorasRedondas(data).then(()=>{
+        reservaModel.novosValores(data).then(()=>{
+          reservaModel.verificaQuadra(data).then(()=>{
+            reservaModel.verificaDuracao(data).then(()=>{
+              reservaModel.verificaDisponibilidade(data, Reserva, 'put').then(()=>{
+                delete data['id'];
+                data.alteradaEm = new Date();
+                Reserva.replaceOrCreate(data, ()=>{
+                  callback(null, data);
+                });
+              }, erro => {
+                callback(erro);
+              });
+            }, erro => {
+              callback(erro);
+            });
+          }, erro=>{
+            callback(erro);
+          });
+        }, erro=>{
+          callback(erro);
+        });
+      }, erro => {
+        callback(erro);
+      });
+    }, erro => {
+      callback(erro);
+    });
+  };
+
+
+
+  /**
    * Verifica a disponibilidade
    * @param {object} data objeto que vai ser utilizado para consulta
    * @param {Function(Error, array)} callback
    */
-
   Reserva.verificaDisponibilidade = function(data, callback) {
     var filtro = {where: {
       inicioEm: data.inicioEm,
