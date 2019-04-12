@@ -10,10 +10,12 @@ const travaDeHorario = (ctx)=>{
     let erro = new Error(erroMsg);
     erro.statusCode = 422;
     erro.code = 'HORARIO_INVALIDO';
-    if (ctx.instance.inicioEm.getHours() < horarioMinimo &&
-        ctx.instance.inicioEm.getHours() > horarioMaximo &&
-        ctx.instance.fimEm.getHours() < horarioMinimo &&
-        ctx.instance.fimEm.getHours() > horarioMaximo) {
+    ctx.inicioEm = new Date(ctx.inicioEm);
+    ctx.fimEm = new Date(ctx.fimEm);
+    if (ctx.inicioEm.getHours() < horarioMinimo &&
+        ctx.inicioEm.getHours() > horarioMaximo &&
+        ctx.fimEm.getHours() < horarioMinimo &&
+        ctx.fimEm.getHours() > horarioMaximo) {
       reject(erro);
     } else {
       resolve(true);
@@ -26,7 +28,7 @@ const verificaHorasRedondas = (ctx)=>{
     let erro = new Error(erroMsg);
     erro.statusCode = 422;
     erro.code = 'HORÁRIO_INVÁLIDO';
-    if (ctx.instance.inicioEm.getMinutes() == 0 && ctx.instance.fimEm.getMinutes() == 0) {
+    if (ctx.inicioEm.getMinutes() == 0 && ctx.fimEm.getMinutes() == 0) {
       resolve(true);
     } else {
       reject(erro);
@@ -35,19 +37,19 @@ const verificaHorasRedondas = (ctx)=>{
 };
 const novosValores = (ctx)=>{
   return new Promise((resolve, reject)=>{
-    ctx.instance.criadoEm = new Date();
-    if (!ctx.instance.status) {
-      ctx.instance.status = 'ativa';
+    ctx.criadoEm = new Date();
+    if (!ctx.status) {
+      ctx.status = 'ativa';
     }
-    let minutos = ctx.instance.fimEm - ctx.instance.inicioEm;
-    ctx.instance.duracao = minutos / 60000;
-    ctx.instance.valorEmReais = parseFloat(ctx.instance.duracao * 0.5);
+    let minutos = ctx.fimEm - ctx.inicioEm;
+    ctx.duracao = minutos / 60000;
+    ctx.valorEmReais = parseFloat(ctx.duracao * 0.5);
     resolve(true);
   });
 };
 const verificaQuadra = (ctx)=>{
   return new Promise((resolve, reject)=>{
-    if (ctx.instance.duracao < 60) {
+    if (ctx.duracao < 60) {
       let erro = new Error('Duração minima de 1h (60 minutos)');
       erro.statusCode = 422;
       reject(erro);
@@ -58,7 +60,7 @@ const verificaQuadra = (ctx)=>{
 };
 const verificaDuracao = (ctx)=>{
   return new Promise((resolve, reject)=>{
-    if (ctx.instance.duracao < 60) {
+    if (ctx.duracao < 60) {
       let erro = new Error('Duração minima de 1h (60 minutos)');
       erro.statusCode = 422;
       reject(erro);
@@ -67,20 +69,20 @@ const verificaDuracao = (ctx)=>{
     }
   });
 };
-const verificaDisponibilidade = (ctx, Reserva)=>{
+const verificaDisponibilidade = (ctx, Reserva, verbo)=>{
   return new Promise((resolve, reject)=>{
-    let filtro = ObjectManipulation.criaFiltroDeintervalo(ctx.instance);
+    let filtro = ObjectManipulation.criaFiltroDeintervalo(ctx);
     let erro =  new Error('O horário solicitado não está disponível, favor selecione um outro horário.');
     erro.code = 'HORARIO_INDISPONIVEL';
     erro.statusCode = 422;
     Reserva.find(filtro, (err, res)=>{
-      if (ctx.isNewInstance &&  res.length > 0) {
+      if (verbo == 'post' &&  res.length > 0) {
         reject(erro);
       } else {
-        if (!ctx.isNewInstance && res.length > 1) {
+        if (verbo == 'put' && res.length > 1) {
           reject(erro);
         } else {
-          if (res.length == 1 && res[0].id == ctx.instance.id) {
+          if (res.length == 1 && res[0].id == ctx.id) {
             reject(erro);
           } else {
             resolve(true);
@@ -144,7 +146,7 @@ const sugestaoHorarios = (data, quadras, Reserva, callback) => {
       if (erro) {
         callback(erro);
       } else {
-        if (resp.length == 0){
+        if (resp.length == 0) {
           resultado.push(obj[key]);
         }
       }

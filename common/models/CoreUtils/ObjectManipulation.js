@@ -7,24 +7,36 @@ const criaObjWhere = (tipo, inicioEm, fimEm)=> {
   };
   return resp;
 };
+const criaFiltroComId = (id)=> {
+  let filtro = {
+    where: {id: id},
+  };
+};
 const alteraHora = (hora, qtd) => {
   return hora.setHours(hora.getHours() + qtd);
 };
 const criaFiltroDeintervalo = (data) => {
-  let intervaloDeHora = [data.inicioEm, data.fimEm];
+  let fim = data.fimEm;
+  let inicio = data.inicioEm;
+  fim.setSeconds(59);
+  fim.setMinutes(59);
+  fim.setHours(fim.getHours() - 1);
+  inicio.setSeconds(1);
+  let intervaloDeHora = [inicio, fim];
   return {where: {
     tipo: data.tipo.toLowerCase(),
     or:
     [{inicioEm: {between: intervaloDeHora}},
       {fimEm: {between: intervaloDeHora}},
       {and: [
-        {inicioEm: {lte: data.inicioEm}},
-        {fimEm: {gte: data.fimEm},
+        {inicioEm: {lt: inicio}},
+        {fimEm: {gt: fim},
         }]},
     ]}};
 };
 module.exports = {
   criaObjWhere,
   alteraHora,
+  criaFiltroComId,
   criaFiltroDeintervalo,
 };

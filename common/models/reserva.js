@@ -4,34 +4,60 @@
 module.exports = function(Reserva) {
   const object = require('../models/CoreUtils/ObjectManipulation');
   const reservaModel = require('../models/CoreUtils/reservaUtils');
-  // Fazendo hooks das requisições POST e PUT
-  Reserva.observe('before save', function verifica(ctx, next) {
-    reservaModel.travaDeHorario(ctx).then(()=>{
-      reservaModel.verificaHorasRedondas(ctx).then(()=>{
-        reservaModel.novosValores(ctx).then(()=>{
-          reservaModel.verificaQuadra(ctx).then(()=>{
-            reservaModel.verificaDuracao(ctx).then(()=>{
-              reservaModel.verificaDisponibilidade(ctx, Reserva).then(()=>{
-                next();
+  /**
+   * Funçao que busca todos as reservas
+   * @param {Function(Error, array)} callback
+   */
+  Reserva.get = (callback) => {
+    Reserva.find((erro, resultado)=>{
+      if (erro) {
+        callback(erro);
+      }
+      callback(null, resultado);
+    });
+  };
+  /**
+   * Funçao que busca todos as reservas
+   * @param {string} id  id que vai ser utilizado para consulta
+   * @param {Function(Error, array)} callback
+   */
+  Reserva.getById = (id, callback) => {
+    Reserva.findById(id, (erro, resultado)=>{
+      if (erro) {
+        callback(erro);
+      }
+      callback(null, resultado);
+    });
+  };
+  Reserva.post = (data, callback) =>{
+    reservaModel.travaDeHorario(data).then(()=>{
+      reservaModel.verificaHorasRedondas(data).then(()=>{
+        reservaModel.novosValores(data).then(()=>{
+          reservaModel.verificaQuadra(data).then(()=>{
+            reservaModel.verificaDuracao(data).then(()=>{
+              reservaModel.verificaDisponibilidade(data, Reserva, 'post').then(()=>{
+                Reserva.create(data, ()=>{
+                  callback(null, data);
+                });
               }, erro => {
-                next(erro);
+                callback(erro);
               });
             }, erro => {
-              next(erro);
+              callback(erro);
             });
           }, erro=>{
-            next(erro);
+            callback(erro);
           });
         }, erro=>{
-          next(erro);
+          callback(erro);
         });
       }, erro => {
-        next(erro);
+        callback(erro);
       });
     }, erro => {
-      next(erro);
+      callback(erro);
     });
-  });
+  };
   /**
    * Verifica a disponibilidade
    * @param {object} data objeto que vai ser utilizado para consulta
@@ -60,8 +86,6 @@ module.exports = function(Reserva) {
       }
     });
   };
- 
-
   /**
    * Verifica a disponibilidade
    * @param {object} id objeto que vai ser utilizado para consulta
