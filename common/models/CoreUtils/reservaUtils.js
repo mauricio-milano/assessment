@@ -156,7 +156,7 @@ const sugestaoHorarios = (data, quadras, Reserva, callback) => {
       callback(null, resultado);
     }, 5000);
   });
-}
+};
 
 module.exports = {
   travaDeHorario,

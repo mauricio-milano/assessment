@@ -1,3 +1,18 @@
-## Client
+## Assessment de back end 
 
-This is the place for your application front-end files.
+#Introdução 
+Sistemas de reservas de quadras
+
+
+#instalação 
+instale as dependencias 
+
+````
+npm install 
+
+```
+#execuçao
+
+```
+nodemon . 
+```

@@ -99,9 +99,6 @@ module.exports = function(Reserva) {
       callback(erro);
     });
   };
-
-
-
   /**
    * Verifica a disponibilidade
    * @param {object} data objeto que vai ser utilizado para consulta
@@ -135,7 +132,6 @@ module.exports = function(Reserva) {
    * @param {Function(Error, array)} callback
    */
   Reserva.deletar = (id, callback)=>{
-    
     Reserva.find({where: {id: id}}, (erro, res)=>{
       if (erro) {
         callback(erro);
